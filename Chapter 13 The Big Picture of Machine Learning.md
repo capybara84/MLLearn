@@ -327,6 +327,59 @@ flowchart LR
 過学習の可能性
 ```
 
+#### PyTorchで確認してみる
+
+ここまで学んだ要素をまとめると、学習ループは次のような形になります。
+
+```python
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
+
+torch.manual_seed(0)
+
+x = torch.randn(40, 3)
+y = (x[:, 0] + x[:, 1] > 0).long()
+
+train_x, val_x = x[:30], x[30:]
+train_y, val_y = y[:30], y[30:]
+
+train_loader = DataLoader(
+    TensorDataset(train_x, train_y),
+    batch_size=8,
+    shuffle=True,
+)
+
+model = nn.Sequential(
+    nn.Linear(3, 8),
+    nn.ReLU(),
+    nn.Linear(8, 2),
+)
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+
+for epoch in range(5):
+    model.train()
+    for batch_x, batch_y in train_loader:
+        logits = model(batch_x)
+        loss = loss_fn(logits, batch_y)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+    model.eval()
+    with torch.no_grad():
+        val_logits = model(val_x)
+        val_loss = loss_fn(val_logits, val_y)
+
+    print(epoch, "train loss:", loss.item(), "val loss:", val_loss.item())
+```
+
+このコードには、データ、モデル、損失関数、最適化、ミニバッチ、検証データがすべて入っています。
+
+実際の機械学習システムでは、この骨格に前処理、評価指標、ログ、保存、再学習などが加わります。
+
 学習では、ハイパーパラメータも重要です。
 
 ```text

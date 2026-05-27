@@ -49,6 +49,47 @@ flowchart LR
     F --> B
 ```
 
+#### PyTorchで確認してみる
+
+教師あり学習では、入力 `x` と正解 `y` のペアを使います。
+
+次のコードでは、2つの特徴量から2クラス分類を行う小さな例を作ります。
+
+```python
+import torch
+from torch import nn
+
+torch.manual_seed(0)
+
+x = torch.tensor([
+    [0.0, 0.1],
+    [0.2, 0.0],
+    [0.8, 0.9],
+    [1.0, 0.7],
+])
+y = torch.tensor([0, 0, 1, 1])
+
+model = nn.Linear(2, 2)
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
+
+logits = model(x)
+loss = loss_fn(logits, y)
+
+optimizer.zero_grad()
+loss.backward()
+optimizer.step()
+
+print("input shape:", x.shape)
+print("target:", y)
+print("logits shape:", logits.shape)
+print("loss:", loss.item())
+```
+
+`x` が入力、`y` が正解ラベルです。
+
+モデルの予測と `y` を比較して損失を計算し、その損失が小さくなるようにパラメータを更新します。
+
 ### 2.2　訓練データと正解ラベル
 
 教師あり学習では、学習に使うデータのことを「訓練データ」と呼びます。

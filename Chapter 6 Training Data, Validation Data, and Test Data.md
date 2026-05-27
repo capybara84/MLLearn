@@ -67,6 +67,36 @@ flowchart LR
     D --> G["最終性能を確認する"]
 ```
 
+#### PyTorchで確認してみる
+
+手元のデータを、訓練データ、検証データ、テストデータに分ける簡単な例です。
+
+```python
+import torch
+
+torch.manual_seed(0)
+
+x = torch.arange(20).reshape(10, 2).float()
+y = torch.tensor([0, 1, 0, 1, 0, 1, 0, 1, 0, 1])
+
+indices = torch.randperm(len(x))
+train_idx = indices[:6]
+val_idx = indices[6:8]
+test_idx = indices[8:]
+
+train_x, train_y = x[train_idx], y[train_idx]
+val_x, val_y = x[val_idx], y[val_idx]
+test_x, test_y = x[test_idx], y[test_idx]
+
+print("train:", train_x.shape, train_y.shape)
+print("validation:", val_x.shape, val_y.shape)
+print("test:", test_x.shape, test_y.shape)
+```
+
+ここでは10件のデータを、6件、2件、2件に分けています。
+
+実際の学習では、訓練データでパラメータを更新し、検証データで設定を調整し、テストデータで最後に性能を確認します。
+
 ### 6.2　訓練データ
 
 訓練データとは、モデルのパラメータを更新するために使うデータです。

@@ -551,6 +551,31 @@ flowchart TD
     D -->|いいえ| F["汎化できている可能性"]
 ```
 
+#### PyTorchで確認してみる
+
+訓練損失と検証損失のログを見ると、過学習の兆候を見つけやすくなります。
+
+```python
+import torch
+
+train_loss = torch.tensor([0.90, 0.62, 0.40, 0.25, 0.15, 0.09])
+val_loss = torch.tensor([0.95, 0.70, 0.52, 0.48, 0.55, 0.70])
+
+best_epoch = torch.argmin(val_loss).item()
+generalization_gap = val_loss - train_loss
+
+print("best epoch:", best_epoch)
+print("best validation loss:", val_loss[best_epoch].item())
+print("generalization gap:", generalization_gap)
+
+if val_loss[-1] > val_loss[best_epoch] and train_loss[-1] < train_loss[best_epoch]:
+    print("validation loss is getting worse while training loss improves")
+```
+
+この例では、訓練損失は下がり続けています。
+
+一方、検証損失は途中から上がっているので、過学習の兆候として読めます。
+
 ### 7.13　よいモデルとは何か
 
 よいモデルとは、単に訓練データで高い性能を出すモデルではありません。
