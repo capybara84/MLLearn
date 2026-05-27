@@ -302,6 +302,34 @@ b  を少し変えたら、損失はどう変わるか
 
 この処理を何度も繰り返すことで、損失がだんだん小さくなることを期待します。
 
+#### PyTorchで確認してみる
+
+次のコードでは、`y = 2x` に近づくように、1つの重み `w` を勾配降下法で更新します。
+
+```python
+import torch
+
+x = torch.tensor([1.0, 2.0, 3.0])
+y = torch.tensor([2.0, 4.0, 6.0])
+
+w = torch.tensor([0.0], requires_grad=True)
+optimizer = torch.optim.SGD([w], lr=0.1)
+
+for step in range(5):
+    y_hat = w * x
+    loss = ((y_hat - y) ** 2).mean()
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    print(step, "w:", w.item(), "loss:", loss.item())
+```
+
+`loss.backward()` で勾配を計算し、`optimizer.step()` でパラメータを更新しています。
+
+この流れは、ニューラルネットワークや Transformer の学習でも基本的に同じです。
+
 ### 5.7　学習率
 
 学習率は、勾配降下法において非常に重要なハイパーパラメータです。

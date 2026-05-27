@@ -297,6 +297,33 @@ flowchart LR
 
 一方、具体的なパラメータの値は、データを使った学習によって決まります。
 
+#### PyTorchで確認してみる
+
+PyTorch では、`nn.Linear` の中に重みとバイアスがパラメータとして入っています。
+
+```python
+import torch
+from torch import nn
+
+model = nn.Linear(in_features=1, out_features=1)
+
+with torch.no_grad():
+    model.weight.fill_(100.0)
+    model.bias.fill_(500.0)
+
+x = torch.tensor([[80.0]])
+y_hat = model(x)
+
+print("weight:", model.weight)
+print("bias:", model.bias)
+print("prediction:", y_hat.item())
+print("num parameters:", sum(p.numel() for p in model.parameters()))
+```
+
+この例では、入力が `80`、重みが `100`、バイアスが `500` なので、予測は `8500` になります。
+
+ここで表示される `weight` と `bias` が、学習によって調整されるパラメータです。
+
 ### 3.4　パラメータを調整するとは何か
 
 学習とは、モデルのパラメータを調整することです。

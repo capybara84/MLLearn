@@ -675,6 +675,29 @@ flowchart LR
     F --> A
 ```
 
+#### PyTorchで確認してみる
+
+確率分布からトークンを選ぶ方法には、最も高い確率を選ぶ方法と、確率に従ってサンプリングする方法があります。
+
+```python
+import torch
+
+torch.manual_seed(0)
+
+tokens = ["atsui", "samui", "tanoshii", "isogashii", "nemui"]
+probabilities = torch.tensor([0.30, 0.20, 0.15, 0.10, 0.25])
+
+greedy_id = torch.argmax(probabilities).item()
+sampled_id = torch.multinomial(probabilities, num_samples=1).item()
+
+print("greedy:", tokens[greedy_id])
+print("sampled:", tokens[sampled_id])
+```
+
+`argmax` は常に最も確率が高い候補を選びます。
+
+`multinomial` は確率が高い候補ほど選ばれやすくしつつ、低い候補も選ばれる余地を残します。
+
 ### 11.11　確率が高いことと正しいことは違う
 
 機械学習モデルは、確率の高い出力を返します。

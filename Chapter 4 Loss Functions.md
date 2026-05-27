@@ -533,6 +533,33 @@ flowchart LR
 
 このため、交差エントロピーを使って学習すると、モデルは正解カテゴリに高い確率を出すように調整されます。
 
+#### PyTorchで確認してみる
+
+PyTorch では、回帰の損失には `MSELoss`、分類の損失には `CrossEntropyLoss` がよく使われます。
+
+```python
+import torch
+from torch import nn
+import torch.nn.functional as F
+
+prediction = torch.tensor([7500.0])
+target_value = torch.tensor([8000.0])
+mse_loss = nn.MSELoss()(prediction, target_value)
+
+logits = torch.tensor([[3.0, 0.5, -1.0]])
+target_class = torch.tensor([0])
+probabilities = F.softmax(logits, dim=1)
+ce_loss = nn.CrossEntropyLoss()(logits, target_class)
+
+print("mse loss:", mse_loss.item())
+print("probabilities:", probabilities)
+print("cross entropy loss:", ce_loss.item())
+```
+
+`CrossEntropyLoss` には、softmax 後の確率ではなく、softmax 前のスコアである `logits` を渡します。
+
+内部で softmax と負の対数尤度に相当する計算をまとめて行うためです。
+
 ### 4.8　損失が小さいほどよい、とはどういうことか
 
 機械学習では、「損失を小さくする」とよく言います。

@@ -251,6 +251,46 @@ b：バイアス
 
 違うのは、モデルの構造がより複雑になり、パラメータの数が非常に多くなることです。
 
+#### PyTorchで確認してみる
+
+次のコードでは、小さな線形回帰モデルを学習します。
+
+入力の `x` は広さを100で割った値、出力の `y` は価格を100で割った値だと考えます。
+
+```python
+import torch
+from torch import nn
+
+torch.manual_seed(0)
+
+x = torch.tensor([[0.4], [0.6], [0.8], [1.0]])
+y = torch.tensor([[0.45], [0.65], [0.85], [1.05]])
+
+model = nn.Linear(1, 1)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+loss_fn = nn.MSELoss()
+
+for step in range(200):
+    y_hat = model(x)
+    loss = loss_fn(y_hat, y)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+with torch.no_grad():
+    test_x = torch.tensor([[0.7]])
+    prediction = model(test_x)
+
+print("weight:", model.weight.item())
+print("bias:", model.bias.item())
+print("prediction:", prediction.item())
+```
+
+学習が進むと、モデルは `y` が `x` にほぼ比例している関係を捉えます。
+
+ここでも、学習しているのは `weight` と `bias` です。
+
 ### 9.4　誤差の測り方
 
 回帰問題では、予測値と正解値のズレを測ります。

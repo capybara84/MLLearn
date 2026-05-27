@@ -581,6 +581,40 @@ Transformer 層
 
 そのために使うのが逆伝播です。
 
+#### PyTorchで確認してみる
+
+小さなニューラルネットワークで、順伝播、損失計算、逆伝播をまとめて確認します。
+
+```python
+import torch
+from torch import nn
+
+torch.manual_seed(0)
+
+model = nn.Sequential(
+    nn.Linear(2, 4),
+    nn.ReLU(),
+    nn.Linear(4, 3),
+)
+
+x = torch.tensor([[0.2, 0.8], [0.9, 0.1]])
+target = torch.tensor([2, 0])
+
+logits = model(x)
+loss = nn.CrossEntropyLoss()(logits, target)
+loss.backward()
+
+print("logits shape:", logits.shape)
+print("loss:", loss.item())
+
+for name, parameter in model.named_parameters():
+    print(name, "grad shape:", parameter.grad.shape)
+```
+
+`logits` は各クラスのスコアです。
+
+`loss.backward()` を呼ぶと、各パラメータに対して勾配が計算されます。
+
 ### 12.9　逆伝播の直感
 
 逆伝播とは、損失から逆向きにたどって、各パラメータの勾配を計算する方法です。

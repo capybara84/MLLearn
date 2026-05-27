@@ -510,6 +510,34 @@ flowchart LR
     E --> F["Transformer 層"]
 ```
 
+#### PyTorchで確認してみる
+
+one-hot 表現と埋め込みベクトルの違いを、PyTorch で見ると次のようになります。
+
+```python
+import torch
+from torch import nn
+import torch.nn.functional as F
+
+token_to_id = {"dog": 0, "cat": 1, "car": 2, "bird": 3}
+token_ids = torch.tensor([token_to_id["dog"], token_to_id["cat"]])
+
+one_hot = F.one_hot(token_ids, num_classes=len(token_to_id)).float()
+
+embedding = nn.Embedding(num_embeddings=len(token_to_id), embedding_dim=3)
+vectors = embedding(token_ids)
+
+print("one-hot:")
+print(one_hot)
+print("embedding vectors:")
+print(vectors)
+print("embedding shape:", vectors.shape)
+```
+
+one-hot 表現は語彙数と同じ長さになります。
+
+一方、埋め込みベクトルでは、語彙数とは別に、モデルが扱いやすい次元数を決められます。
+
 ### 10.8　特徴量の組み合わせ
 
 現実の予測問題では、特徴量が単独で効くとは限りません。

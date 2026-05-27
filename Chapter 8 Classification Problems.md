@@ -419,6 +419,29 @@ Transformer や大規模言語モデルでも、softmax は非常に重要です
 
 つまり、言語モデルの出力も、大きな多クラス分類として見ることができます。
 
+#### PyTorchで確認してみる
+
+PyTorch では、`softmax` を使ってスコアを確率分布に変換できます。
+
+```python
+import torch
+import torch.nn.functional as F
+
+labels = ["dog", "cat", "bird"]
+logits = torch.tensor([[3.2, 1.8, 0.4]])
+
+probabilities = F.softmax(logits, dim=1)
+predicted_id = torch.argmax(probabilities, dim=1).item()
+
+print("probabilities:", probabilities)
+print("predicted label:", labels[predicted_id])
+print("sum:", probabilities.sum().item())
+```
+
+`logits` は確率になる前のスコアです。
+
+`softmax` 後の値はすべて0以上になり、合計は1になります。
+
 ### 8.6　確率として出力する
 
 分類モデルが確率を出すことには、重要な意味があります。

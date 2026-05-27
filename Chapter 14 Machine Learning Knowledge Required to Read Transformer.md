@@ -187,6 +187,33 @@ if x > 0:
 
 つまり、次トークン予測という単純な形の中に、多くの言語理解の要素が含まれています。
 
+#### PyTorchで確認してみる
+
+次トークン予測では、同じトークン列を1つずらして、入力と正解を作ります。
+
+```python
+import torch
+
+vocab = {"wagahai": 0, "wa": 1, "neko": 2, "de": 3, "aru": 4}
+token_ids = torch.tensor([
+    vocab["wagahai"],
+    vocab["wa"],
+    vocab["neko"],
+    vocab["de"],
+    vocab["aru"],
+])
+
+input_ids = token_ids[:-1]
+target_ids = token_ids[1:]
+
+print("input ids:", input_ids)
+print("target ids:", target_ids)
+```
+
+`input_ids` の各位置に対して、`target_ids` の同じ位置が「次に来るべきトークン」になります。
+
+大規模言語モデルの学習でも、このずらした入力と正解の考え方が基本になります。
+
 ### 14.3　トークンを入力、次トークンを正解と見る
 
 Transformer を読むためには、文章がどのように入力になるのかを理解する必要があります。
@@ -940,6 +967,43 @@ flowchart LR
     G --> H
     H --> I["文脈を反映した表現"]
 ```
+
+#### PyTorchで確認してみる
+
+Scaled Dot-Product Attention は、PyTorch では次のように書けます。
+
+```python
+import math
+import torch
+import torch.nn.functional as F
+
+torch.manual_seed(0)
+
+batch_size = 1
+seq_len = 4
+d_model = 8
+
+x = torch.randn(batch_size, seq_len, d_model)
+Wq = torch.randn(d_model, d_model)
+Wk = torch.randn(d_model, d_model)
+Wv = torch.randn(d_model, d_model)
+
+Q = x @ Wq
+K = x @ Wk
+V = x @ Wv
+
+scores = Q @ K.transpose(-2, -1)
+scores = scores / math.sqrt(d_model)
+weights = F.softmax(scores, dim=-1)
+output = weights @ V
+
+print("attention weights shape:", weights.shape)
+print("output shape:", output.shape)
+```
+
+`weights` の形は `[batch_size, seq_len, seq_len]` です。
+
+これは、各トークンが他の各トークンをどれくらい見るかを表します。
 
 ### 14.12　Attention を直感で理解する
 
